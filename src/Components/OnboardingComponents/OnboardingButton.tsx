@@ -10,20 +10,20 @@ type Props = {}
 
 const OnboardingButton = ({ flatListIndex, flatListRef, itemLength, x }: onboardingButtonParams) => {
     const { width: SCREEN_WIDTH } = useWindowDimensions();
+
     const buttonAnimation = useAnimatedStyle(() => {
         return {
             width:
                 flatListIndex.value === itemLength - 1
-                    ? withSpring(interpolateColor(x.value, [(itemLength - 1) * SCREEN_WIDTH, itemLength * SCREEN_WIDTH], [50, SCREEN_WIDTH]))
+                    ? withSpring(140)
                     : withTiming(0),
-            height: 50,
-            backgroundColor: interpolateColor(x.value, [(itemLength - 1) * SCREEN_WIDTH, itemLength * SCREEN_WIDTH], ["#ff6b6b", "#ff6b6b"])
+            height: 60,
         }
     })
 
     const arrowAnimation = useAnimatedStyle(() => {
         return {
-            opacity: flatListIndex.value === itemLength - 1 ? withTiming(1) : withTiming(0),
+            opacity: flatListIndex.value === itemLength - 1 ? withTiming(0) : withTiming(1),
             width: 30,
             height: 30,
             transform: [
@@ -63,10 +63,10 @@ const OnboardingButton = ({ flatListIndex, flatListRef, itemLength, x }: onboard
     return (
         <TouchableWithoutFeedback
             onPress = {() => {
-                if (flatListIndex.value === itemLength - 1) {
-                    flatListRef.current?.scrollToIndex({ index: flatListIndex.value + 1 });
+                if (flatListIndex.value === itemLength + 1) {
+                    flatListRef.current?.scrollToIndex({ index: flatListIndex.value + 1});
                 } else {
-                    alert("Click here to continue")
+                    navigation.replace("TabsStack", { screen: "Home" });
                 }
             }}   
         >
@@ -78,6 +78,7 @@ const OnboardingButton = ({ flatListIndex, flatListRef, itemLength, x }: onboard
                 </Animated.Text>
                 <Animated.Image 
                     source={require("../../../assets/onboarding/cat404.json")} 
+                    style={[sty.arrow, arrowAnimation]}
                 />
             </Animated.View>
         </TouchableWithoutFeedback>    

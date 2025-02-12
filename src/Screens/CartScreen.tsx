@@ -3,7 +3,7 @@ import React from 'react'
 import { TabsStackScreenProps} from '../Navigation/TabsNavigation'
 type Props = {}
 
-const CartScreen = ({navigation, route }: TabsStackScreenProps<'CartScreen'>) => {
+const CartScreen = ({navigation, route }: TabsStackScreenProps<'Cart'>) => {
    return (
     <View style={styles.container}>
       <Text style={styles.text}>Cart Screen</Text>

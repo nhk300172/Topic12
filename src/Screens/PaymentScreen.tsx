@@ -3,7 +3,7 @@ import React from 'react'
 import { TabsStackScreenProps} from '../Navigation/TabsNavigation'
 type Props = {}
 
-const PaymentScreen = ({navigation, route }: TabsStackScreenProps<'PaymentScreen'>) => {
+const PaymentScreen = ({navigation, route }: TabsStackScreenProps<'Payment'>) => {
    return (
     <View style={styles.container}>
       <Text style={styles.text}>Payment Screen</Text>

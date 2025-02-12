@@ -3,9 +3,15 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import OnboardingScreen from "../Screens/OnboardingScreen";
 import TabsNavigator, { TabsStackParams} from "./TabsNavigation";
 import { NavigatorScreenParams } from "@react-navigation/native";
+import HomeScreen from './../Screens/HomeScreen';
+import CartScreen from './../Screens/CartScreen';
+import PaymentScreen from './../Screens/PaymentScreen';
 
 export type RootStackParams = {
     OnboardingScreen: undefined
+    // HomeScreen: NavigatorScreenParams<TabsStackParams>
+    // CartScreen: undefined
+    // PaymentScreen: undefined
     TabsStack: NavigatorScreenParams<TabsStackParams>
 }
 

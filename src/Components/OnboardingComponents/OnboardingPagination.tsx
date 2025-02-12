@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React from 'react';
-import { onboardingPaginationParams } from '../TypesCheck/OnboardingTypesCheck';
+import { onboardingPaginationParams } from '../../TypesCheck/OnboardingTypesCheck';
 import OnboardingDots from './OnboardingDots';
 
 type Props = {}

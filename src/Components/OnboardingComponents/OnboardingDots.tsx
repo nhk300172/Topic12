@@ -1,6 +1,6 @@
 import { View, Text, useWindowDimensions, StyleSheet } from "react-native"
 import React from "react"
-import { onboardingDotParams } from "../TypesCheck/OnboardingTypesCheck"
+import { onboardingDotParams } from "../../TypesCheck/OnboardingTypesCheck"
 import Animated, { Extrapolation, interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated"
 
 type Props = {}
@@ -15,7 +15,7 @@ const OnboardingDots = ({ index, x }: onboardingDotParams) => {
                 (index + 1) * SCREEN_WIDTH
             ],
 
-            [10, 20, 10],
+            [10, 30, 10],
             Extrapolation.CLAMP
         )
         const opacityAnimation = interpolate(x.value,

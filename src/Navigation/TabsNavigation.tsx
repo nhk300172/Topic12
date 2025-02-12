@@ -8,10 +8,10 @@ import ProfileScreen from '../Screens/ProfileScreen';
 import { Entypo, AntDesign, Ionicons } from '@expo/vector-icons';
 
 export type TabsStackParams = {
-    HomeScreen: undefined;
-    CartScreen: undefined;
-    PaymentScreen: undefined;
-    ProfileScreen: undefined;
+    Home: undefined;
+    Cart: undefined;
+    Payment: undefined;
+    Profile: undefined;
 }
 
 const TabsStack = createBottomTabNavigator<TabsStackParams>()
@@ -24,7 +24,7 @@ const TabsNavigator = () => {
     return (
         <TabsStack.Navigator screenOptions={{ tabBarShowLabel: false }}>            
             <TabsStack.Screen 
-                name="HomeScreen" component={HomeScreen} options={{
+                name="Home" component={HomeScreen} options={{
                     headerShown: false,
                     tabBarIcon: ({ focused }) => focused ? (
                         <Entypo name="home" size={24} color="#00333a" />
@@ -35,7 +35,7 @@ const TabsNavigator = () => {
             />
 
             <TabsStack.Screen 
-                name="CartScreen" component={CartScreen} options={{
+                name="Cart" component={CartScreen} options={{
                     headerShown: false,
                     tabBarIcon: ({ focused }) => focused ? (
                         <Ionicons name="cart" size={24} color="#00333a" />
@@ -46,7 +46,7 @@ const TabsNavigator = () => {
             />
 
             <TabsStack.Screen 
-                name="PaymentScreen" component={PaymentScreen} options={{
+                name="Payment" component={PaymentScreen} options={{
                     headerShown: false,
                     tabBarIcon: ({ focused }) => focused ? (
                         <Ionicons name="card" size={24} color="#00333a" />
@@ -57,7 +57,7 @@ const TabsNavigator = () => {
             />
 
             <TabsStack.Screen 
-                name="ProfileScreen" component={ProfileScreen} options={{
+                name="Profile" component={ProfileScreen} options={{
                     headerShown: false,
                     tabBarIcon: ({ focused }) => focused ? (
                         <Ionicons name="person" size={24} color="#00333a" />

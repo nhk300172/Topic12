@@ -3,7 +3,7 @@ import React from 'react'
 import { TabsStackScreenProps} from '../Navigation/TabsNavigation'
 type Props = {}
 
-const ProfileScreen = ({navigation, route }: TabsStackScreenProps<'ProfileScreen'>) => {
+const ProfileScreen = ({navigation, route }: TabsStackScreenProps<'Profile'>) => {
    return (
     <View style={styles.container}>
       <Text style={styles.text}>Profile Screen</Text>
