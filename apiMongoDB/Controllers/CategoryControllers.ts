@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import { CATEGORIES } from '../Models/CategoryModel'
 import { CategoryObj, UpdateCategory } from '../dto/Categories';
+import path from 'path';
 
 export const createCategory = async (req: Request, res: Response) => {
     const { name } = <CategoryObj>req.body;
@@ -45,7 +46,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     const files = req.files as [Express.Multer.File]
 
     if (files) {
-        const images = files.map((file: Express.Multer.File) => file.filename);
+        const images = files.map(file => `${path}${file.filename}`);
         try {
             const catUpdate = await CATEGORIES.findByIdAndUpdate(req.params.id, 
                 { name: name, images: images }, { new: true });
