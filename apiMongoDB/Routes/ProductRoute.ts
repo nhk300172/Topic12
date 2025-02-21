@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import multer from 'multer'
 import path from 'path'
-import { createProduct, getAllProducts, getProductByCatID, getProductByID,  getisFeaturedProducts, getNonFeaturedProducts} from '../Controllers'
+import { createProduct, getAllProducts, getProductByCatID, getProductByID,  getFeaturedProducts} from '../Controllers'
 import { get } from 'http';
 
 const router = express.Router();
@@ -21,7 +21,6 @@ router.post('/createProduct', images, createProduct);
 router.get('/getProductByCatID/:CatID', getProductByCatID);
 router.get('/getProductByID/:id', getProductByID);
 router.get('/getAllProducts', getAllProducts);
-router.get('/getisFeaturedProducts', getisFeaturedProducts);
-router.get('/getNonFeaturedProducts', getNonFeaturedProducts); 
+router.get('/getFeaturedProducts/:isFeatured', getFeaturedProducts);
 
 export { router as ProductRoute };

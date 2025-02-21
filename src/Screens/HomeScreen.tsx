@@ -1,4 +1,4 @@
-import { View, Text, Platform, ScrollView, SectionList, Pressable, Alert } from 'react-native';
+import { View, Text, Platform, ScrollView, SectionList, Pressable, Alert, FlatList, Image, TouchableOpacity } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState} from 'react';
 import { TabsStackScreenProps } from '../Navigation/TabsNavigation';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +6,7 @@ import { HeadersComponent } from './../Components/HeaderComponents/HeaderCompone
 import ImageSlider from '../Components/HomeScreenComponents/ImageSlider';
 import { ProductListParams, FetchProductsParam } from '../TypesCheck/HomeProps';
 import { CategoryCard } from '../Components/HomeScreenComponents/CategoryCard';
-import { fetchCategories, fetchProductsByCatID, fetchNonFeaturedProducts, fetchIsFeaturedProducts } from '../MiddleWares/HomeMiddleWares';
+import { fetchCategories, fetchFeaturedProducts, fetchProductsByCatID } from '../MiddleWares/HomeMiddleWares';
 import { useFocusEffect } from '@react-navigation/native';
 import { getProductByCatID } from '../../apiMongoDB/Controllers';
 
@@ -32,23 +32,22 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
   const [getCategory, setGetCategory] = useState<ProductListParams[]>([]);
   const [getProductsByCatID, setGetProductsByCatID] = useState<ProductListParams[]>([]);
   const [activeCat, setActiveCat] = useState<string>('');
-  const [nonFeaturedProducts, setNonFeaturedProducts] = useState<ProductListParams[]>([]);
-  const [isFeaturedProducts, setIsFeaturedProducts] = useState<ProductListParams[]>([]);
-
   const bgImg = require('../pictures/MenCategory.jpg');
-  
 
-  // useEffect(() => {
-  //   fetchCategories({ setGetCategory });
-  // }, []);
+  const [isFeatured, setIsFeatured] = useState<boolean | null>(null);
+  const [featuredProducts, setFeaturedProducts] = useState<ProductListParams[]>([]);
+  
+  useEffect(() => {
+    if (isFeatured !== null) {
+        fetchFeaturedProducts({ setFeaturedProducts, isFeatured });
+    }
+}, [isFeatured]);
 
   useEffect(() => {
     fetchCategories({ setGetCategory });
-    fetchNonFeaturedProducts({ setProducts: setNonFeaturedProducts });
-    fetchIsFeaturedProducts({ setProducts: setIsFeaturedProducts });
-}, []);  
+  }, []);
 
-useEffect(() => {
+  useEffect(() => {
     console.log("fetchProductsByCatID", fetchProductsByCatID);
     if (activeCat) {
       fetchProductsByCatID({ setGetProductsByCatID, catID: activeCat });
@@ -74,8 +73,7 @@ useEffect(() => {
       >
         <ImageSlider images={sliderImages} />
       </ScrollView>
-      <View style={{ backgroundColor: "yellow", flex: 1, minHeight: 90 }}>
-
+      <View style={{ backgroundColor: "yellow", flex: 2 }}>
         <Text>
           Categories
         </Text>
@@ -84,22 +82,22 @@ useEffect(() => {
           style={{  marginTop: 4 }}
         >
           {
-            getCategory.map((item) => (
-  <CategoryCard 
-    key={item._id} 
-    item={{ name: item.name, images: item.images, _id: item._id }}  
-    catStyleProps={{
-        height: 50,
-        width: 55,                     
-        radius: 20, 
-        resizeMode: "contain"
-    }}
-    catProps={{ 
-        activeCat: activeCat, onPress: () => setActiveCat(item._id) 
-    }}
-  />
-))
-
+            getCategory.map((item, index) => (
+              <CategoryCard 
+                //key={index} 
+                item={{ "name": item.name, "images": item.images, _id: item._id }}  
+                catStyleProps={{                      
+                    "height": 50,
+                    "width": 55,                     
+                    "radius": 20, 
+                    "resizeMode": "contain"
+                   // imageBgHt: 150,
+                }}
+                catProps={{ 
+                    "activeCat": activeCat, "onPress": () => setActiveCat(item._id) 
+                }}
+              />
+            ))
           }
         </ScrollView> 
       </View>
@@ -146,50 +144,53 @@ useEffect(() => {
         </ScrollView>
 
       </View>
+      <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 10 }}>
+                <TouchableOpacity
+                    onPress={() => setIsFeatured(true)}
+                    style={{
+                        backgroundColor: isFeatured ? "#007bff" : "#ccc",
+                        padding: 10,
+                        marginRight: 10,
+                        borderRadius: 5
+                    }}>
+                    <Text style={{ color: "#fff" }}>Featured Products (True)</Text>
+                </TouchableOpacity>
 
-      <View style={{ backgroundColor: '#fff', padding: 10, marginTop: 10 }}>
-    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Non-Featured Products</Text>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    {nonFeaturedProducts.length > 0 ? (
-        nonFeaturedProducts.map((item, index) => (
-            <View key={index} style={{ alignItems: 'center', marginRight: 10 }}>
-                <CategoryCard 
-                    item={{ name: item.name, images: item.images, _id: item._id }}  
-                    catStyleProps={{ height: 50, width: 100, radius: 10, resizeMode: "contain" }}
-                    catProps={{ onPress: () => Alert.alert(item.name) }}
-                />
-                <Text style={{ textAlign: 'center', marginTop: 5 }}>{item.name}</Text>
+                <TouchableOpacity
+                    onPress={() => setIsFeatured(false)}
+                    style={{
+                        backgroundColor: !isFeatured ? "#007bff" : "#ccc",
+                        padding: 10,
+                        borderRadius: 5
+                    }}>
+                    <Text style={{ color: "#fff" }}>Non-Featured Products (False)</Text>
+                </TouchableOpacity>
             </View>
-        ))
-    ) : (
-        <Text style={{ padding: 10 }}>No non-featured products found</Text>
-    )}
-</ScrollView>
 
-</View>
-
-<View style={{ backgroundColor: '#fff', padding: 10, marginTop: 10 }}>
-    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Featured Products</Text>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    {isFeaturedProducts.length > 0 ? (
-        isFeaturedProducts.map((item, index) => (
-            <View key={index} style={{ alignItems: 'center', marginRight: 10 }}>
-                <CategoryCard 
-                    item={{ name: item.name, images: item.images, _id: item._id }}  
-                    catStyleProps={{ height: 50, width: 100, radius: 10, resizeMode: "contain" }}
-                    catProps={{ onPress: () => Alert.alert(item.name) }}
-                />
-                <Text style={{ textAlign: 'center', marginTop: 5 }}>{item.name}</Text>
-            </View>
-        ))
-    ) : (
-        <Text style={{ padding: 10 }}>No featured products found</Text>
-    )}
-</ScrollView>
-
-</View>
-
-    </SafeAreaView> // ✅ Properly closed SafeAreaView
+           
+            <FlatList
+                data={featuredProducts}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                    <View style={{
+                        flexDirection: "row",
+                        padding: 10,
+                        borderBottomWidth: 1,
+                        borderColor: "#ddd"
+                    }}>
+                        <Image
+                            source={{ uri: item.images[0] }}
+                            style={{ width: 80, height: 80, marginRight: 10, borderRadius: 5 }}
+                        />
+                        <View>
+                            <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
+                            <Text style={{ color: "#888" }}>Price: {item.price} VND</Text>
+                        </View>
+                    </View>
+                )}
+            />
+            
+    </SafeAreaView> 
   );
 };
 

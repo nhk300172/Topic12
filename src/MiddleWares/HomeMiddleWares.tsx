@@ -1,7 +1,7 @@
-import React from 'react';
-import { ProductListParams, FetchProductsParam } from '../TypesCheck/HomeProps';
-import axios from 'axios';
-//import { ICatProps } from './../TypesCheck/CategoryTypes';
+import React from "react";
+import { ProductListParams, FetchProductsParam } from "../TypesCheck/HomeProps";
+import axios from "axios";
+
 interface ICatProps {
     setGetCategory: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
 }
@@ -11,111 +11,75 @@ interface IProdByCatProps {
     setGetProductsByCatID: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
 }
 
-interface IProductProps {
-    //catID?: string;
-    setProducts: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
+interface IFeaturedProps {
+    isFeatured: boolean;
+    setFeaturedProducts: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
 }
 
+const BASE_URL = "http://192.168.68.111"; // Định nghĩa BASE_URL chung
+
+// Lấy danh mục sản phẩm
 export const fetchCategories = async ({ setGetCategory }: ICatProps) => {
     try {
-        const response = await axios.get("http://10.106.23.34:9000/category/getAllCategories");
+        const response = await axios.get(`${BASE_URL}:9000/category/getAllCategories`);
         console.log("API Response", response.data);
 
         if (Array.isArray(response.data)) {
             const fixedData = response.data.map(item => ({
                 ...item,
-                images: item.images.map((img: string) => 
-                    img.replace("http://localhost", "http://10.106.23.34")
-            )
-        }));
-
+                images: item.images.map((img: string) => img.replace("http://localhost", BASE_URL)),
+            }));
             setGetCategory(fixedData);
         } else {
-            console.warn("fetchCategories: Dữ liệu API không là mảng", response.data);
+            console.warn("fetchCategories: Dữ liệu API không phải là mảng", response.data);
             setGetCategory([]);
         }
     } catch (error) {
-        console.log("axios get error", error);
+        console.log("Axios get error", error);
         setGetCategory([]);
     }
 };
 
-export const fetchProductsByCatID = async ({ setGetProductsByCatID, catID }: IProdByCatProps) => {
+// Lấy sản phẩm theo danh mục
+export const fetchProductsByCatID = async ({ catID, setGetProductsByCatID }: IProdByCatProps) => {
     try {
-        const response: FetchProductsParam = await axios.get(`http://10.106.23.34:9000/product/getProductByCatID/${catID}`);
+        const response: FetchProductsParam = await axios.get(`${BASE_URL}:9000/product/getProductByCatID/${catID}`);
         console.log("API Response", response.data);
 
         if (Array.isArray(response.data)) {
             const fixedData = response.data.map(item => ({
                 ...item,
-                images: item.images.map((img: string) => 
-                    img.replace("http://localhost", "http://10.106.23.34")
-            )
-        }));
-    
+                images: item.images.map((img: string) => img.replace("http://localhost", BASE_URL)),
+            }));
             setGetProductsByCatID(fixedData);
-        }   else {
-            console.warn("fetchProductsByCatID: Dữ liệu API không là mảng", response.data);
+        } else {
+            console.warn("fetchProductsByCatID: Dữ liệu API không phải là mảng", response.data);
             setGetProductsByCatID([]);
         }
     } catch (error) {
-        console.log("axios get error", error);
+        console.log("Axios get error", error);
         setGetProductsByCatID([]);
     }
 };
 
-// Lấy danh sách sản phẩm không nổi bật
-export const fetchNonFeaturedProducts = async ({ setProducts }: IProductProps) => {
+// Lấy sản phẩm nổi bật
+export const fetchFeaturedProducts = async ({ isFeatured, setFeaturedProducts }: IFeaturedProps) => {
     try {
-        const response = await axios.get("http://10.106.23.34:9000/product/getNonFeaturedProducts");
-        console.log("API Response - Non Featured", response.data);
+        const response = await axios.get(`${BASE_URL}:9000/product/getFeaturedProducts/${isFeatured}`);
+        console.log("API Response", response.data);
 
         if (Array.isArray(response.data)) {
             const fixedData = response.data.map(item => ({
                 ...item,
-                images: item.images.map((img: string) => 
-                    img.replace("http://localhost", "http://10.106.23.34")
-                )
+                images: item.images.map((img: string) => img.replace("http://localhost", BASE_URL)),
             }));
-
-            setProducts(fixedData);
+            setFeaturedProducts(fixedData);
         } else {
-            console.warn("fetchNonFeaturedProducts: Dữ liệu API không là mảng", response.data);
-            setProducts([]);
+            console.warn("fetchFeaturedProducts: Dữ liệu API không phải là mảng", response.data);
+            setFeaturedProducts([]);
         }
     } catch (error) {
-        console.error("axios get error (Non Featured Products)", error);
-        setProducts([]);
+        console.error("Error fetching featured products:", error);
+        setFeaturedProducts([]);
     }
 };
-
-// Lấy danh sách sản phẩm nổi bật
-export const fetchIsFeaturedProducts = async ({ setProducts }: IProductProps) => {
-    try {
-        const response = await axios.get("http://10.106.23.34:9000/product/getIsFeaturedProducts");
-        console.log("API Response - Featured", response.data);
-
-        if (Array.isArray(response.data)) {
-            const fixedData = response.data.map(item => ({
-                ...item,
-                images: item.images.map((img: string) => 
-                    img.replace("http://localhost", "http://10.106.23.34")
-                )
-            }));
-
-            setProducts(fixedData);
-        } else {
-            console.warn("fetchIsFeaturedProducts: Dữ liệu API không là mảng", response.data);
-            setProducts([]);
-        }
-    } catch (error) {
-        console.error("axios get error (Featured Products)", error);
-        setProducts([]);
-    }
-};
-
-
-
-
-
-
