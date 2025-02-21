@@ -17,3 +17,4 @@ export interface FetchProductsParam {
         results: ProductListParams[]
     }
 }
+
