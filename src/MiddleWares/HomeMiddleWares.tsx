@@ -1,5 +1,6 @@
 import React from "react";
 import { ProductListParams, FetchProductsParam } from "../TypesCheck/HomeProps";
+import { IProductProps } from "../TypesCheck/ProductTypes";
 import axios from "axios";
 
 interface ICatProps {
@@ -11,12 +12,17 @@ interface IProdByCatProps {
     setGetProductsByCatID: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
 }
 
-interface IFeaturedProps {
-    isFeatured: boolean;
-    setFeaturedProducts: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
-}
+interface ITrendingProductProps {
+    setTrendingProducts: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
 
-const BASE_URL = "http://192.168.68.111"; // Định nghĩa BASE_URL chung
+}
+// interface IFeaturedProps {
+//     isFeatured: boolean;
+//     setFeaturedProducts: React.Dispatch<React.SetStateAction<ProductListParams[]>>;
+// }
+
+//const BASE_URL = "http://192.168.68.111"; // Định nghĩa BASE_URL chung
+const BASE_URL = "http://10.106.23.142"
 
 // Lấy danh mục sản phẩm
 export const fetchCategories = async ({ setGetCategory }: ICatProps) => {
@@ -63,9 +69,9 @@ export const fetchProductsByCatID = async ({ catID, setGetProductsByCatID }: IPr
 };
 
 // Lấy sản phẩm nổi bật
-export const fetchFeaturedProducts = async ({ isFeatured, setFeaturedProducts }: IFeaturedProps) => {
+export const fetchTrendingProducts = async ({ setTrendingProducts }: ITrendingProductProps) => {
     try {
-        const response = await axios.get(`${BASE_URL}:9000/product/getFeaturedProducts/${isFeatured}`);
+        const response: FetchProductsParam = await axios.get(`${BASE_URL}:9000/product/getTrendingProducts`);
         console.log("API Response", response.data);
 
         if (Array.isArray(response.data)) {
@@ -73,13 +79,47 @@ export const fetchFeaturedProducts = async ({ isFeatured, setFeaturedProducts }:
                 ...item,
                 images: item.images.map((img: string) => img.replace("http://localhost", BASE_URL)),
             }));
-            setFeaturedProducts(fixedData);
+            setTrendingProducts(fixedData);
         } else {
-            console.warn("fetchFeaturedProducts: Dữ liệu API không phải là mảng", response.data);
-            setFeaturedProducts([]);
+            console.warn("fetchTrendingProducts: Dữ liệu API không phải là mảng", response.data);
+            setTrendingProducts([]);
         }
     } catch (error) {
-        console.error("Error fetching featured products:", error);
-        setFeaturedProducts([]);
+        console.error("Error fetching trending products:", error);
+        setTrendingProducts([]);
     }
-};
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const fetchFeaturedProducts = async ({ isFeatured, setFeaturedProducts }: IFeaturedProps) => {
+//     try {
+//         const response = await axios.get(`${BASE_URL}:9000/product/getFeaturedProducts/${isFeatured}`);
+//         console.log("API Response", response.data);
+
+//         if (Array.isArray(response.data)) {
+//             const fixedData = response.data.map(item => ({
+//                 ...item,
+//                 images: item.images.map((img: string) => img.replace("http://localhost", BASE_URL)),
+//             }));
+//             setFeaturedProducts(fixedData);
+//         } else {
+//             console.warn("fetchFeaturedProducts: Dữ liệu API không phải là mảng", response.data);
+//             setFeaturedProducts([]);
+//         }
+//     } catch (error) {
+//         console.error("Error fetching featured products:", error);
+//         setFeaturedProducts([]);
+//     }
+// };

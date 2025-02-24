@@ -1,4 +1,4 @@
-import { View, Text, Platform, ScrollView, SectionList, Pressable, Alert, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Platform, ScrollView, SectionList, Pressable, Alert } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState} from 'react';
 import { TabsStackScreenProps } from '../Navigation/TabsNavigation';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,9 +6,11 @@ import { HeadersComponent } from './../Components/HeaderComponents/HeaderCompone
 import ImageSlider from '../Components/HomeScreenComponents/ImageSlider';
 import { ProductListParams, FetchProductsParam } from '../TypesCheck/HomeProps';
 import { CategoryCard } from '../Components/HomeScreenComponents/CategoryCard';
-import { fetchCategories, fetchFeaturedProducts, fetchProductsByCatID } from '../MiddleWares/HomeMiddleWares';
+import { fetchCategories, fetchProductsByCatID, fetchTrendingProducts } from '../MiddleWares/HomeMiddleWares';
 import { useFocusEffect } from '@react-navigation/native';
 import { getProductByCatID } from '../../apiMongoDB/Controllers';
+import { ProductCard } from '../Components/HomeScreenComponents/ProductCard';
+
 
 type Props = {}
 const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
@@ -33,18 +35,12 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
   const [getProductsByCatID, setGetProductsByCatID] = useState<ProductListParams[]>([]);
   const [activeCat, setActiveCat] = useState<string>('');
   const bgImg = require('../pictures/MenCategory.jpg');
-
-  const [isFeatured, setIsFeatured] = useState<boolean | null>(null);
-  const [featuredProducts, setFeaturedProducts] = useState<ProductListParams[]>([]);
-  
-  useEffect(() => {
-    if (isFeatured !== null) {
-        fetchFeaturedProducts({ setFeaturedProducts, isFeatured });
-    }
-}, [isFeatured]);
+  const [trendingProducts, setTrendingProducts] = useState<ProductListParams[]>([]);
+  const productWidth = 100; // Define productWidth with a suitable value
 
   useEffect(() => {
     fetchCategories({ setGetCategory });
+    fetchTrendingProducts({ setTrendingProducts });
   }, []);
 
   useEffect(() => {
@@ -84,7 +80,7 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
           {
             getCategory.map((item, index) => (
               <CategoryCard 
-                //key={index} 
+                key={item._id} 
                 item={{ "name": item.name, "images": item.images, _id: item._id }}  
                 catStyleProps={{                      
                     "height": 50,
@@ -134,7 +130,7 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
                      // imageBgHt: 150,
                   }}
                   catProps={{ 
-                      "onPress": () => Alert.alert(item.name), "imageBg": bgImg,
+                      "onPress": () => navigation.navigate("productDetails", item), "imageBg": bgImg,
                   }}
                 />
               ))
@@ -144,53 +140,47 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
         </ScrollView>
 
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 10 }}>
-                <TouchableOpacity
-                    onPress={() => setIsFeatured(true)}
-                    style={{
-                        backgroundColor: isFeatured ? "#007bff" : "#ccc",
-                        padding: 10,
-                        marginRight: 10,
-                        borderRadius: 5
-                    }}>
-                    <Text style={{ color: "#fff" }}>Featured Products (True)</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setIsFeatured(false)}
-                    style={{
-                        backgroundColor: !isFeatured ? "#007bff" : "#ccc",
-                        padding: 10,
-                        borderRadius: 5
-                    }}>
-                    <Text style={{ color: "#fff" }}>Non-Featured Products (False)</Text>
-                </TouchableOpacity>
-            </View>
-
-           
-            <FlatList
-                data={featuredProducts}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                    <View style={{
-                        flexDirection: "row",
-                        padding: 10,
-                        borderBottomWidth: 1,
-                        borderColor: "#ddd"
-                    }}>
-                        <Image
-                            source={{ uri: item.images[0] }}
-                            style={{ width: 80, height: 80, marginRight: 10, borderRadius: 5 }}
-                        />
-                        <View>
-                            <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.name}</Text>
-                            <Text style={{ color: "#888" }}>Price: {item.price} VND</Text>
-                        </View>
-                    </View>
-                )}
-            />
-            
-    </SafeAreaView> 
+      <View style={{ 
+        backgroundColor: 'red', flexDirection: "row", justifyContent: 'space-between',
+        marginTop: 10
+      }}>
+          <Text style={{ color: "yellow", fontSize: 14, fontWeight: "bold", padding: 10 }}>
+            Trending Products of the Week
+          </Text>
+      </View>
+      <View style={{ 
+        backgroundColor: "#fff", borderWidth: 7, borderColor: "green", flexDirection: "row",
+        justifyContent: "space-between", alignItems: "center", flexWrap: "wrap",
+      }}
+      >
+        { 
+          trendingProducts.map((item, index) => (
+            <ProductCard
+              item={{ 
+                _id: item?._id || index.toString(),
+                name: item?.name || 'Product Name',
+                images: item?.images || [""],
+                price: item?.price || 0,
+                oldPrice: item?.oldPrice || item?.price || 0,
+                description: item?.description || 'Product Description',                                
+                quantity: item?.quantity ?? 1,
+                inStock: item?.inStock ?? true,
+                isFeatured: Boolean(item?.isFeatured),
+                category: item?.category?.toString || 'Product Category',
+              }}
+              key={index}
+              pStyleProps={{ "resizeMode": "contain", "width": productWidth, height: 10, "marginBottom": 5 }}
+              productProps={{
+                "imageBg": bgImg,
+                "onPress": () => {
+                  navigation.navigate("productDetails", item)
+                }
+              }}
+            ></ProductCard>
+          ))
+        }
+      </View>
+    </SafeAreaView> // ✅ Properly closed SafeAreaView
   );
 };
 
