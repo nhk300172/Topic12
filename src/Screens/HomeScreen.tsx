@@ -10,17 +10,38 @@ import { fetchCategories, fetchProductsByCatID, fetchTrendingProducts } from '..
 import { useFocusEffect } from '@react-navigation/native';
 import { getProductByCatID } from '../../apiMongoDB/Controllers';
 import { ProductCard } from '../Components/HomeScreenComponents/ProductCard';
-
+import { useSelector } from 'react-redux';
+import { CartState } from '../TypesCheck/productCartTypes';
+import DisplayMessage from '../Components/ProductDetails/DisplayMessage';
 
 type Props = {}
 const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
   const sectionListRef = useRef<SectionList>(null);
   //const sectionListRef = useRef<SectionList<ProductListParams>>(null);
 
-
+  const cart = useSelector((state: CartState) => state.cart.cart);
   const gotoCartScreen = () => {
-    navigation.navigate('Cart');
-  };
+    if (cart.length === 0) {
+        setMessage("Cart is empty. Please add products to cart.");
+        setDisplayMessage(true);
+        setTimeout(() => {
+            setDisplayMessage(false);
+        }, 3000);
+    } else {
+        navigation.navigate("TabsStack", { screen: "Cart" });
+    }
+};
+
+const goToPreviousScreen = () => {
+    if (navigation.canGoBack()) {
+        console.log("Chuyển về trang trước.");
+        navigation.goBack();
+    } else {
+        console.log("Không thể quay lại, chuyển về trang Onboarding.");
+        navigation.navigate("OnboardingScreen"); // Điều hướng fallback
+    }
+};
+
 
   const sliderImages = [
     'https://images.unsplash.com/photo-1570051008600-b34baa49e751?q=80&w=2085&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -59,9 +80,12 @@ const HomeScreen = ({ navigation, route }: TabsStackScreenProps<'Home'>) => {
     }, [activeCat])
   );
 
+  const [message, setMessage] = React.useState("");
+  const [displayMessage, setDisplayMessage] = React.useState<boolean>(false);
   return (
-    <SafeAreaView style={{ paddingTop: Platform.OS === 'android' ? 40 : 0, flex: 1, backgroundColor: 'violet' }}>
-      <HeadersComponent gotoCartScreen={gotoCartScreen} />
+    <SafeAreaView style={{ paddingTop: Platform.OS === 'android' ? 1 : 0, flex: 1, backgroundColor: 'violet' }}>
+      {displayMessage && <DisplayMessage message={message} visible={() => setDisplayMessage(!displayMessage)} />}
+      <HeadersComponent gotoCartScreen={gotoCartScreen} cartLength={cart.length} goToPrevious={goToPreviousScreen} />
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}

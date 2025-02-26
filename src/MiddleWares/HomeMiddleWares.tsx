@@ -22,7 +22,7 @@ interface ITrendingProductProps {
 // }
 
 //const BASE_URL = "http://192.168.68.111"; // Định nghĩa BASE_URL chung
-const BASE_URL = "http://10.106.23.142"
+const BASE_URL = "http://10.106.22.74"
 
 // Lấy danh mục sản phẩm
 export const fetchCategories = async ({ setGetCategory }: ICatProps) => {
@@ -89,8 +89,6 @@ export const fetchTrendingProducts = async ({ setTrendingProducts }: ITrendingPr
         setTrendingProducts([]);
     }
 }
-
-
 
 
 

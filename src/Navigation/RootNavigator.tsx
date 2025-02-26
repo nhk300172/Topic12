@@ -9,7 +9,15 @@ export type RootStackParams = {
     OnboardingScreen: undefined
     TabsStack: NavigatorScreenParams<TabsStackParams>
     Deals: undefined
-    Cart: undefined
+    Cart?: {
+        _id: string;
+        images: [string];
+        name: string;
+        price: number;
+        color?: string;
+        size? : string;
+        quantity: number;
+    }
     Profile: undefined
     productDetails: {
         _id: string;

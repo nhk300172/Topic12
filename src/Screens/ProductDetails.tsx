@@ -3,26 +3,76 @@ import React from 'react';
 import { RootStackScreenProps } from '../Navigation/RootNavigator';
 import { HeadersComponent } from '../Components/HeaderComponents/HeaderComponent';
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { CartState } from '../TypesCheck/productCartTypes';
+import { ProductListParams } from '../TypesCheck/HomeProps';
+import { addToCart } from '../redux/CartReducer';
+import DisplayMessage from '../Components/ProductDetails/DisplayMessage';
 
 const { width, height } = Dimensions.get('window');
 
 export const ProductDetails = ({ route, navigation }: RootStackScreenProps<'productDetails'>) => {
     const { _id, images, name, price, oldPrice, inStock, color, size, description, quantity } = route.params;
 
+    const productItemObj: ProductListParams = route.params as ProductListParams;
+    
     const gotoCartScreen = () => {
-        navigation.navigate('Cart');
-    };
+        if (cart.length === 0) {
+            setMessage("Cart is empty. Please add products to cart.");
+            setDisplayMessage(true);
+            setTimeout(() => {  
+                setDisplayMessage(false);
+            }, 3000);
+        } else 
+            navigation.navigate("TabsStack", { screen: "Cart"});
+    }
 
     const goToPreviousScreen = () => {
         if (navigation.canGoBack()) {
+            console.log("Go back to previous page");
             navigation.goBack();
         } else {
+            console.log("Can't go back to previous page, back to Onboardingding.");
             navigation.navigate('OnboardingScreen');
         }
     };
+    const cart = useSelector((state: CartState) => state.cart.cart);
+    const dispatch = useDispatch();
+    const [addedToCart, setAddedToCart] = React.useState(false);
+    const [message, setMessage] = React.useState("");
+    const [displayMessage, setDisplayMessage] = React.useState<boolean>(false);
+
+    const addItemToCart = (ProductItemObj: ProductListParams) => {
+        if (ProductItemObj.quantity <= 0) {
+            setMessage("Product is out of stock.");
+            setDisplayMessage(true);
+            setTimeout(() => {
+                setDisplayMessage(false);
+            }, 3000);
+        } else {
+            const findItem = cart.find((product) => product._id === _id);
+            if (findItem) {
+                setMessage("Product is already in cart.");
+                setDisplayMessage(true);
+                setTimeout(() => {
+                    setDisplayMessage(false);
+                }, 3000);
+            } else {
+                setAddedToCart(!addedToCart);
+                dispatch(addToCart(ProductItemObj));
+                setMessage("Product added to cart successfully.");
+                setDisplayMessage(true);
+                setTimeout(() => {
+                    setDisplayMessage(false);
+                }, 3000);
+            }
+        }
+    }
+
 
     return (
-        <SafeAreaView style={{ paddingTop: Platform.OS === 'android' ? 40 : 0, flex: 1, backgroundColor: 'white' }}>
+        <SafeAreaView style={{ paddingTop: Platform.OS === 'android' ? 20 : 0, flex: 1, backgroundColor: 'white' }}>
+            {displayMessage && <DisplayMessage message={message} visible={() => setDisplayMessage(!displayMessage)} />}
             <HeadersComponent gotoCartScreen={gotoCartScreen} goToPrevious={goToPreviousScreen} />
             <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: 'pink' }}>
                 <ImageBackground style={{ width, minHeight: height, marginTop: 25 }}>
@@ -36,14 +86,9 @@ export const ProductDetails = ({ route, navigation }: RootStackScreenProps<'prod
                     </View>
 
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <Image style={{ width: 300, height: 300, resizeMode: 'contain' }} source={{ uri: images?.[0] || 'https://via.placeholder.com/300' }} />
+                        <Image style={{ width: 400, height: 400, resizeMode: 'contain' }} source={{ uri: images?.[0] || 'https://via.placeholder.com/300' }} />
                     </View>
-
-                    <Pressable style={{ marginTop: 20, backgroundColor: 'green', padding: 15, alignItems: 'center', borderRadius: 10 }} onPress={() => Alert.alert('Add to Cart', 'Product added to cart successfully.')}
-                    >
-                        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Add to Cart</Text>
-                    </Pressable>
-                </ImageBackground>
+                </ImageBackground> 
 
                 <View style={{ padding: 20, backgroundColor: 'white' }}>
                     <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{name}</Text>
@@ -66,16 +111,31 @@ export const ProductDetails = ({ route, navigation }: RootStackScreenProps<'prod
                 </View>
 
                 <View style={{ padding: 20, backgroundColor: 'white', marginBottom: 20 }}>
-    <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'purple', marginBottom: 10 }}>Description</Text>
-    <Text style={{ fontSize: 16, color: 'green' }}>
-        Size 7 (24-26kg, 122-130cm){"\n"}
-        Size 8 (27-30kg, 130-137cm){"\n"}
-        Size 9 (31-34kg, 137-145cm){"\n"}
-        Size 10 (35-39kg, 145-150cm)
-    </Text>
-</View>
-
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'purple', marginBottom: 10 }}>Description</Text>
+                    <Text style={{ fontSize: 16, color: 'green' }}>
+                        Size 7 (24-26kg, 122-130cm){"\n"}
+                        Size 8 (27-30kg, 130-137cm){"\n"}
+                        Size 9 (31-34kg, 137-145cm){"\n"}
+                        Size 10 (35-39kg, 145-150cm)
+                    </Text>
+                </View>
             </ScrollView>
+            <View style={{ backgroundColor: "white", paddingBottom: 0 }}>
+                <Pressable
+                    style={{ backgroundColor: "green", padding: 15, alignItems: "center", justifyContent: "center", borderRadius: 10, margin: 10 }}
+                    onPress={() =>
+                        addItemToCart(productItemObj)}>
+                    {addedToCart ? (
+                        <Text style={{ color: "violet", fontSize: 20, fontWeight: "bold" }}>
+                            Add to Cart</Text>
+                    ) : (
+                        <Text style={{ color: "orange", fontSize: 20, fontWeight: "bold" }}>
+                            Add to Cart</Text>
+                    )
+                    }
+                </Pressable>
+            </View>
+
         </SafeAreaView>
     );
 };
